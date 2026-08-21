@@ -1,7 +1,4 @@
--- ==============================================
--- KAIRON HUB - COMPLETE FIXED VERSION
--- For Blox Fruits (All Seas)
--- ==============================================
+--kairon hub bloxfruit all features
 
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
