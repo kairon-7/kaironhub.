@@ -1,12 +1,10 @@
---kairon hub bloxfruit all features
-
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 
 local VALID_KEY = "zenor-7"
-local DISCORD_LINK = "https://discord.gg/WtYQ4c97t"
+local DISCORD_LINK = "https://discord.gg/wfSAuayQr"
 
 local function Corner(p, r)
     local c = Instance.new("UICorner", p)
@@ -107,7 +105,7 @@ DiscordBtn.MouseButton1Down:Connect(function()
     Notif.Size = UDim2.new(1,-40,0,24)
     Notif.Position = UDim2.new(0,20,0,152)
     Notif.BackgroundTransparency = 1
-    Notif.Text = "Discord link copied! discord.gg/WtYQ4c97t"
+    Notif.Text = "Discord link copied! discord.gg/wfSAuayQr"
     Notif.TextSize = 11
     Notif.Font = Enum.Font.Gotham
     Notif.TextColor3 = Color3.fromRGB(88,101,242)
