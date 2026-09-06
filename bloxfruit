@@ -2,9 +2,9 @@ local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 local VirtualUser = game:GetService("VirtualUser")
-local GuiService = game:GetService("GuiService")
 
 local DISCORD_LINK = "https://discord.gg/wfSAuayQr"
 local VALID_KEY = "kairon-script"
@@ -73,19 +73,19 @@ local Sub = Instance.new("TextLabel", KWin)
 Sub.Size = UDim2.new(1, -40, 0, 20)
 Sub.Position = UDim2.new(0, 20, 0, 58)
 Sub.BackgroundTransparency = 1
-Sub.Text = "Join our Discord to get your key"
+Sub.Text = "Complete the link below to get your key"
 Sub.TextSize = 12
 Sub.Font = Enum.Font.Gotham
 Sub.TextColor3 = Color3.fromRGB(110, 110, 140)
 Sub.TextXAlignment = Enum.TextXAlignment.Center
 
 local DiscordBtn = Instance.new("TextButton", KWin)
-DiscordBtn.Size = UDim2.new(1, -40, 0, 38)
+DiscordBtn.Size = UDim2.new(1, -40, 0, 34)
 DiscordBtn.Position = UDim2.new(0, 20, 0, 84)
 DiscordBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 DiscordBtn.Text = "Join Discord — discord.gg/wfSAuayQr"
 DiscordBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-DiscordBtn.TextSize = 13
+DiscordBtn.TextSize = 12
 DiscordBtn.Font = Enum.Font.GothamBold
 DiscordBtn.BorderSizePixel = 0
 DiscordBtn.AutoButtonColor = false
@@ -95,12 +95,11 @@ DiscordBtn.MouseButton1Down:Connect(function()
 	Tween(DiscordBtn, { BackgroundColor3 = Color3.fromRGB(60, 72, 200) }, 0.1)
 	task.delay(0.15, function() Tween(DiscordBtn, { BackgroundColor3 = Color3.fromRGB(88, 101, 242) }, 0.15) end)
 	pcall(function() setclipboard(DISCORD_LINK) end)
-	pcall(function() GuiService:OpenBrowserWindow(DISCORD_LINK) end)
 	local n = Instance.new("TextLabel", KWin)
 	n.Size = UDim2.new(1, -40, 0, 20)
-	n.Position = UDim2.new(0, 20, 0, 126)
+	n.Position = UDim2.new(0, 20, 0, 122)
 	n.BackgroundTransparency = 1
-	n.Text = "Discord link copied & opened! Get your key there."
+	n.Text = "Discord link copied!"
 	n.TextSize = 11
 	n.Font = Enum.Font.Gotham
 	n.TextColor3 = Color3.fromRGB(88, 101, 242)
@@ -173,7 +172,7 @@ local function ValidateKey()
 			LoadMainHub()
 		end)
 	else
-		StatusLbl.Text = "Invalid key. Join Discord to get your key."
+		StatusLbl.Text = "Invalid key. Complete the LootLabs link to get yours."
 		StatusLbl.TextColor3 = Color3.fromRGB(220, 60, 60)
 		Tween(SubmitBtn, { BackgroundColor3 = Color3.fromRGB(160, 40, 40) }, 0.1)
 		task.delay(0.2, function() Tween(SubmitBtn, { BackgroundColor3 = Color3.fromRGB(55, 55, 130) }, 0.2) end)
