@@ -299,9 +299,13 @@ function LoadMainHub()
 				if bv then bv:Destroy() end
 				local bc = hrp:FindFirstChild("BodyClip")
 				if bc then bc:Destroy() end
+				local bp = hrp:FindFirstChild("RivoBP")
+				if bp then bp:Destroy() end
 			end
 			local hum = char:FindFirstChild("Humanoid")
-			if hum then hum.PlatformStand = false end
+			if hum then
+				hum.PlatformStand = false
+			end
 		end
 	end
 
@@ -328,6 +332,7 @@ function LoadMainHub()
 
 	function topos(cf)
 		if not isAlive() or not cf then return end
+		if TweenActive then return end -- prevent overlapping
 
 		local char = LP.Character
 		local hrp  = char:FindFirstChild("HumanoidRootPart")
@@ -382,16 +387,37 @@ function LoadMainHub()
 		tw:Play()
 		tw.Completed:Connect(function(state)
 			if state == Enum.PlaybackState.Completed then
+				-- Force HRP to final position
 				local h = char:FindFirstChild("HumanoidRootPart")
 				if h then
 					h.CFrame = cf
+					-- Anchor with BodyPosition to prevent rubberbanding
 					local bp = Instance.new("BodyPosition", h)
+					bp.Name = "RivoBP"
 					bp.MaxForce = Vector3.new(1e6, 1e6, 1e6)
-					bp.P = 3000
-					bp.D = 200
+					bp.P = 5000
+					bp.D = 1000
 					bp.Position = cf.Position
-					task.wait(0.8)
+					-- Disable gravity for a moment
+					local hum2 = char:FindFirstChild("Humanoid")
+					if hum2 then
+						hum2.PlatformStand = true
+						hum2.Sit = true
+					end
+					-- Wait and then clean up
+					task.wait(0.6)
+					-- Remove BodyPosition and restore
 					bp:Destroy()
+					if hum2 then
+						hum2.PlatformStand = false
+						hum2.Sit = false
+					end
+					-- Ensure velocity zero
+					h.Velocity = Vector3.new(0,0,0)
+					h.RotVelocity = Vector3.new(0,0,0)
+					-- Remove all teleport helpers
+					stopTeleport()
+				else
 					stopTeleport()
 				end
 			end
