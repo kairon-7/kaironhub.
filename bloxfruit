@@ -2,11 +2,9 @@ local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 local VirtualUser = game:GetService("VirtualUser")
 
-local LOOTLABS_LINK = "https://links.lootlabs.gg/s?jue4VTww"
 local DISCORD_LINK = "https://discord.gg/wfSAuayQr"
 local VALID_KEY = "kairon-script"
 
@@ -74,48 +72,19 @@ local Sub = Instance.new("TextLabel", KWin)
 Sub.Size = UDim2.new(1, -40, 0, 20)
 Sub.Position = UDim2.new(0, 20, 0, 58)
 Sub.BackgroundTransparency = 1
-Sub.Text = "Complete the link below to get your key"
+Sub.Text = "Join our Discord to get your key"
 Sub.TextSize = 12
 Sub.Font = Enum.Font.Gotham
 Sub.TextColor3 = Color3.fromRGB(110, 110, 140)
 Sub.TextXAlignment = Enum.TextXAlignment.Center
 
-local LootBtn = Instance.new("TextButton", KWin)
-LootBtn.Size = UDim2.new(1, -40, 0, 38)
-LootBtn.Position = UDim2.new(0, 20, 0, 84)
-LootBtn.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-LootBtn.Text = "Get Key — Click Here (LootLabs)"
-LootBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-LootBtn.TextSize = 13
-LootBtn.Font = Enum.Font.GothamBold
-LootBtn.BorderSizePixel = 0
-LootBtn.AutoButtonColor = false
-Corner(LootBtn, 8)
-
-LootBtn.MouseButton1Down:Connect(function()
-	Tween(LootBtn, { BackgroundColor3 = Color3.fromRGB(200, 100, 0) }, 0.1)
-	task.delay(0.15, function() Tween(LootBtn, { BackgroundColor3 = Color3.fromRGB(255, 140, 0) }, 0.15) end)
-	pcall(function() setclipboard(LOOTLABS_LINK) end)
-	local n = Instance.new("TextLabel", KWin)
-	n.Size = UDim2.new(1, -40, 0, 20)
-	n.Position = UDim2.new(0, 20, 0, 126)
-	n.BackgroundTransparency = 1
-	n.Text = "Copied! Paste in browser to get key"
-	n.TextSize = 11
-	n.Font = Enum.Font.Gotham
-	n.TextColor3 = Color3.fromRGB(255, 180, 50)
-	n.TextWrapped = true
-	n.ZIndex = 10
-	task.delay(3, function() pcall(function() n:Destroy() end) end)
-end)
-
 local DiscordBtn = Instance.new("TextButton", KWin)
-DiscordBtn.Size = UDim2.new(1, -40, 0, 34)
-DiscordBtn.Position = UDim2.new(0, 20, 0, 130)
+DiscordBtn.Size = UDim2.new(1, -40, 0, 38)
+DiscordBtn.Position = UDim2.new(0, 20, 0, 84)
 DiscordBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
 DiscordBtn.Text = "Join Discord — discord.gg/wfSAuayQr"
 DiscordBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-DiscordBtn.TextSize = 12
+DiscordBtn.TextSize = 13
 DiscordBtn.Font = Enum.Font.GothamBold
 DiscordBtn.BorderSizePixel = 0
 DiscordBtn.AutoButtonColor = false
@@ -127,9 +96,9 @@ DiscordBtn.MouseButton1Down:Connect(function()
 	pcall(function() setclipboard(DISCORD_LINK) end)
 	local n = Instance.new("TextLabel", KWin)
 	n.Size = UDim2.new(1, -40, 0, 20)
-	n.Position = UDim2.new(0, 20, 0, 168)
+	n.Position = UDim2.new(0, 20, 0, 126)
 	n.BackgroundTransparency = 1
-	n.Text = "Discord link copied!"
+	n.Text = "Discord link copied! Join and get your key"
 	n.TextSize = 11
 	n.Font = Enum.Font.Gotham
 	n.TextColor3 = Color3.fromRGB(88, 101, 242)
@@ -140,7 +109,7 @@ end)
 
 local InputBG = Instance.new("Frame", KWin)
 InputBG.Size = UDim2.new(1, -40, 0, 42)
-InputBG.Position = UDim2.new(0, 20, 0, 172)
+InputBG.Position = UDim2.new(0, 20, 0, 130)
 InputBG.BackgroundColor3 = Color3.fromRGB(18, 18, 30)
 InputBG.BorderSizePixel = 0
 Corner(InputBG, 8)
@@ -161,7 +130,7 @@ KeyInput.ClearTextOnFocus = false
 
 local StatusLbl = Instance.new("TextLabel", KWin)
 StatusLbl.Size = UDim2.new(1, -40, 0, 20)
-StatusLbl.Position = UDim2.new(0, 20, 0, 218)
+StatusLbl.Position = UDim2.new(0, 20, 0, 176)
 StatusLbl.BackgroundTransparency = 1
 StatusLbl.Text = ""
 StatusLbl.TextSize = 12
@@ -171,7 +140,7 @@ StatusLbl.TextXAlignment = Enum.TextXAlignment.Center
 
 local SubmitBtn = Instance.new("TextButton", KWin)
 SubmitBtn.Size = UDim2.new(1, -40, 0, 44)
-SubmitBtn.Position = UDim2.new(0, 20, 0, 242)
+SubmitBtn.Position = UDim2.new(0, 20, 0, 200)
 SubmitBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 130)
 SubmitBtn.Text = "Unlock Hub"
 SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -202,7 +171,7 @@ local function ValidateKey()
 			LoadMainHub()
 		end)
 	else
-		StatusLbl.Text = "Invalid key. Complete the LootLabs link to get yours."
+		StatusLbl.Text = "Invalid key. Join Discord to get your key."
 		StatusLbl.TextColor3 = Color3.fromRGB(220, 60, 60)
 		Tween(SubmitBtn, { BackgroundColor3 = Color3.fromRGB(160, 40, 40) }, 0.1)
 		task.delay(0.2, function() Tween(SubmitBtn, { BackgroundColor3 = Color3.fromRGB(55, 55, 130) }, 0.2) end)
@@ -219,6 +188,7 @@ SubmitBtn.MouseButton1Down:Connect(ValidateKey)
 KeyInput.FocusLost:Connect(function(e) if e then ValidateKey() end end)
 
 function LoadMainHub()
+	-- ==== MAIN HUB CODE (unchanged) ====
 	World1 = game.PlaceId == 2753915549 or game.PlaceId == 85211729168715
 	World2 = game.PlaceId == 4442272183 or game.PlaceId == 79091703265657
 	World3 = game.PlaceId == 7449423635 or game.PlaceId == 100117331123089
@@ -264,22 +234,18 @@ function LoadMainHub()
 			and getHRP()
 	end
 
-	-- NO TWEEN TP — direct CFrame write only, no bounce
 	local function topos(cf)
 		if not isAlive() then return end
 		pcall(function()
 			local hrp = getHRP()
 			if not hrp then return end
-			-- step-walk toward destination to avoid the rubber-band kick
 			local dist = (cf.Position - hrp.Position).Magnitude
 			if dist > 2000 then
-				-- for huge distances: anchor, warp, release
 				hrp.Anchored = true
 				hrp.CFrame = cf
 				task.wait(0.05)
 				hrp.Anchored = false
 			else
-				-- for normal distances: move in steps so server accepts it
 				local steps = math.ceil(dist / _G.TpSpeed)
 				steps = math.clamp(steps, 1, 30)
 				for i = 1, steps do
@@ -611,7 +577,6 @@ function LoadMainHub()
 			and LP.PlayerGui.Main:FindFirstChild("Quest")
 	end
 
-	-- AUTO FARM LOOP
 	spawn(function()
 		while task.wait(0.1) do
 			if _G.AutoFarm then
@@ -667,7 +632,6 @@ function LoadMainHub()
 		end
 	end)
 
-	-- AUTO NEAR LOOP
 	spawn(function()
 		while task.wait(0.1) do
 			if _G.AutoNear then
@@ -695,7 +659,6 @@ function LoadMainHub()
 		end
 	end)
 
-	-- BRING MONSTER LOOP
 	spawn(function()
 		while task.wait(0.05) do
 			if _G.BringMonster and StartBring then
@@ -725,7 +688,6 @@ function LoadMainHub()
 		end
 	end)
 
-	-- AUTO BOSS LOOP
 	spawn(function()
 		while task.wait(0.1) do
 			if _G.AutoBoss and _G.SelectBoss and _G.SelectBoss ~= "" then
@@ -755,7 +717,6 @@ function LoadMainHub()
 		end
 	end)
 
-	-- AUTO CHEST LOOP — collects ALL nearby chests rapidly, fires multiple open remotes
 	spawn(function()
 		while task.wait(0.15) do
 			if _G.AutoChest then
@@ -781,11 +742,9 @@ function LoadMainHub()
 						topos(nearest.pivot)
 						task.wait(0.1)
 						local chest = nearest.obj
-						-- Fire every possible chest remote
 						pcall(function() ReplicatedStorage.Remotes.CommF_:InvokeServer("ChestInteract", chest) end)
 						pcall(function() ReplicatedStorage.Remotes.CommF_:InvokeServer("OpenChest", chest) end)
 						pcall(function() ReplicatedStorage.Remotes.CommF_:InvokeServer("Loot", chest) end)
-						-- Also fire touch to trigger proximity collection
 						pcall(function()
 							for _, part in pairs(chest:GetDescendants()) do
 								if part:IsA("BasePart") then
@@ -797,7 +756,6 @@ function LoadMainHub()
 								end
 							end
 						end)
-						-- Walk into it by teleporting directly on top
 						task.wait(0.05)
 						topos(nearest.pivot)
 					end
@@ -806,7 +764,6 @@ function LoadMainHub()
 		end
 	end)
 
-	-- HAKI LOOP
 	spawn(function()
 		while task.wait(0.1) do
 			if _G.Haki then
@@ -819,7 +776,6 @@ function LoadMainHub()
 		end
 	end)
 
-	-- PULL ALL PLAYERS — loop with direct HRP warp
 	spawn(function()
 		while task.wait(0.3) do
 			if _G.PullAllPlayers then
@@ -839,7 +795,6 @@ function LoadMainHub()
 		end
 	end)
 
-	-- INF ABILITY LOOP
 	spawn(function()
 		while task.wait() do
 			if _G.InfAbility then
@@ -864,7 +819,6 @@ function LoadMainHub()
 		end
 	end)
 
-	-- NOCLIP LOOP
 	spawn(function()
 		while task.wait(0.5) do
 			if NoClip and LP.Character then
@@ -877,7 +831,6 @@ function LoadMainHub()
 		end
 	end)
 
-	-- IDLE PREVENTION
 	pcall(function()
 		LP.Idled:Connect(function()
 			VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
@@ -886,7 +839,6 @@ function LoadMainHub()
 		end)
 	end)
 
-	-- PLAYER ESP LOOP
 	spawn(function()
 		while task.wait(1) do
 			if ESPPlayer then
@@ -938,7 +890,6 @@ function LoadMainHub()
 		end
 	end)
 
-	-- DEVIL FRUIT ESP
 	spawn(function()
 		while task.wait(1) do
 			if DevilFruitESP then
@@ -983,7 +934,6 @@ function LoadMainHub()
 		end
 	end)
 
-	-- CHEST ESP
 	spawn(function()
 		while task.wait(1) do
 			if _G.ChestESP then
@@ -1346,3 +1296,5 @@ function LoadMainHub()
 		end })
 	end)
 end
+
+LoadMainHub()
