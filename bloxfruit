@@ -4,6 +4,7 @@ local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CollectionService = game:GetService("CollectionService")
 local VirtualUser = game:GetService("VirtualUser")
+local GuiService = game:GetService("GuiService")
 
 local DISCORD_LINK = "https://discord.gg/wfSAuayQr"
 local VALID_KEY = "kairon-script"
@@ -94,11 +95,12 @@ DiscordBtn.MouseButton1Down:Connect(function()
 	Tween(DiscordBtn, { BackgroundColor3 = Color3.fromRGB(60, 72, 200) }, 0.1)
 	task.delay(0.15, function() Tween(DiscordBtn, { BackgroundColor3 = Color3.fromRGB(88, 101, 242) }, 0.15) end)
 	pcall(function() setclipboard(DISCORD_LINK) end)
+	pcall(function() GuiService:OpenBrowserWindow(DISCORD_LINK) end)
 	local n = Instance.new("TextLabel", KWin)
 	n.Size = UDim2.new(1, -40, 0, 20)
 	n.Position = UDim2.new(0, 20, 0, 126)
 	n.BackgroundTransparency = 1
-	n.Text = "Discord link copied! Join and get your key"
+	n.Text = "Discord link copied & opened! Get your key there."
 	n.TextSize = 11
 	n.Font = Enum.Font.Gotham
 	n.TextColor3 = Color3.fromRGB(88, 101, 242)
@@ -188,7 +190,6 @@ SubmitBtn.MouseButton1Down:Connect(ValidateKey)
 KeyInput.FocusLost:Connect(function(e) if e then ValidateKey() end end)
 
 function LoadMainHub()
-	-- ==== MAIN HUB CODE (unchanged) ====
 	World1 = game.PlaceId == 2753915549 or game.PlaceId == 85211729168715
 	World2 = game.PlaceId == 4442272183 or game.PlaceId == 79091703265657
 	World3 = game.PlaceId == 7449423635 or game.PlaceId == 100117331123089
@@ -1296,5 +1297,3 @@ function LoadMainHub()
 		end })
 	end)
 end
-
-LoadMainHub()
