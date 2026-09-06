@@ -14,13 +14,11 @@ local function Corner(p, r)
 	local c = Instance.new("UICorner", p)
 	c.CornerRadius = UDim.new(0, r or 8)
 end
-
 local function Stroke(p, col, thick)
 	local s = Instance.new("UIStroke", p)
 	s.Color = col or Color3.fromRGB(55, 55, 100)
 	s.Thickness = thick or 1.5
 end
-
 local function Tween(obj, props, t)
 	TweenService:Create(obj, TweenInfo.new(t or 0.18, Enum.EasingStyle.Quad), props):Play()
 end
@@ -46,7 +44,7 @@ BG.BackgroundTransparency = 0.35
 BG.BorderSizePixel = 0
 
 local KWin = Instance.new("Frame", KeySG)
-KWin.Size = UDim2.new(0, 340, 0, 340)
+KWin.Size = UDim2.new(0, 340, 0, 360)
 KWin.AnchorPoint = Vector2.new(0.5, 0.5)
 KWin.Position = UDim2.new(0.5, 0, 0.5, 0)
 KWin.BackgroundColor3 = Color3.fromRGB(10, 10, 18)
@@ -54,7 +52,7 @@ KWin.BackgroundTransparency = 1
 KWin.BorderSizePixel = 0
 Corner(KWin, 12)
 Stroke(KWin, Color3.fromRGB(50, 50, 100), 1.5)
-Tween(KWin, { BackgroundTransparency = 0, Size = UDim2.new(0, 400, 0, 360) }, 0.35)
+Tween(KWin, { BackgroundTransparency = 0, Size = UDim2.new(0, 400, 0, 380) }, 0.35)
 
 local Accent = Instance.new("Frame", KWin)
 Accent.Size = UDim2.new(1, 0, 0, 3)
@@ -237,10 +235,10 @@ function LoadMainHub()
 	_G.Haki = false
 	_G.TeleportIsland = false
 	_G.PullAllPlayers = false
+	_G.TpSpeed = 200
 
 	ESPPlayer = false
 	DevilFruitESP = false
-	FlowerESP = false
 	IslandESP = false
 	NoClip = false
 	StartBring = false
@@ -266,34 +264,33 @@ function LoadMainHub()
 			and getHRP()
 	end
 
+	-- NO TWEEN TP — direct CFrame write only, no bounce
 	local function topos(cf)
 		if not isAlive() then return end
 		pcall(function()
 			local hrp = getHRP()
 			if not hrp then return end
+			-- step-walk toward destination to avoid the rubber-band kick
 			local dist = (cf.Position - hrp.Position).Magnitude
-			local t = math.clamp(dist / 350, 0.05, 15)
-			if not LP.Character:FindFirstChild("PartTele") then
-				local p = Instance.new("Part", LP.Character)
-				p.Size = Vector3.new(10, 1, 10)
-				p.Name = "PartTele"
-				p.Anchored = true
-				p.Transparency = 1
-				p.CanCollide = false
-				p.CFrame = hrp.CFrame
-			end
-			local tw = TweenService:Create(
-				LP.Character.PartTele,
-				TweenInfo.new(t, Enum.EasingStyle.Linear),
-				{ CFrame = cf }
-			)
-			tw:Play()
-			tw.Completed:Connect(function()
-				if LP.Character and LP.Character:FindFirstChild("PartTele") then
-					LP.Character.PartTele:Destroy()
+			if dist > 2000 then
+				-- for huge distances: anchor, warp, release
+				hrp.Anchored = true
+				hrp.CFrame = cf
+				task.wait(0.05)
+				hrp.Anchored = false
+			else
+				-- for normal distances: move in steps so server accepts it
+				local steps = math.ceil(dist / _G.TpSpeed)
+				steps = math.clamp(steps, 1, 30)
+				for i = 1, steps do
+					if not isAlive() then break end
+					local alpha = i / steps
+					local lerpPos = hrp.CFrame:Lerp(cf, alpha)
+					hrp.CFrame = lerpPos
+					task.wait(0.016)
 				end
-			end)
-			hrp.CFrame = cf
+				hrp.CFrame = cf
+			end
 		end)
 	end
 
@@ -614,6 +611,7 @@ function LoadMainHub()
 			and LP.PlayerGui.Main:FindFirstChild("Quest")
 	end
 
+	-- AUTO FARM LOOP
 	spawn(function()
 		while task.wait(0.1) do
 			if _G.AutoFarm then
@@ -669,6 +667,7 @@ function LoadMainHub()
 		end
 	end)
 
+	-- AUTO NEAR LOOP
 	spawn(function()
 		while task.wait(0.1) do
 			if _G.AutoNear then
@@ -696,8 +695,9 @@ function LoadMainHub()
 		end
 	end)
 
+	-- BRING MONSTER LOOP
 	spawn(function()
-		while task.wait(0.1) do
+		while task.wait(0.05) do
 			if _G.BringMonster and StartBring then
 				pcall(function()
 					local hrp = getHRP()
@@ -706,8 +706,7 @@ function LoadMainHub()
 						if mob.Name == MonFarm
 							and mob:FindFirstChild("Humanoid")
 							and mob:FindFirstChild("HumanoidRootPart")
-							and mob.Humanoid.Health > 0
-							and (mob.HumanoidRootPart.Position - PosMon.Position).Magnitude <= 500 then
+							and mob.Humanoid.Health > 0 then
 							mob.HumanoidRootPart.CFrame = hrp.CFrame * CFrame.new(0, 3, 0)
 							mob.HumanoidRootPart.CanCollide = false
 							mob.Head.CanCollide = false
@@ -726,6 +725,7 @@ function LoadMainHub()
 		end
 	end)
 
+	-- AUTO BOSS LOOP
 	spawn(function()
 		while task.wait(0.1) do
 			if _G.AutoBoss and _G.SelectBoss and _G.SelectBoss ~= "" then
@@ -755,16 +755,16 @@ function LoadMainHub()
 		end
 	end)
 
+	-- AUTO CHEST LOOP — collects ALL nearby chests rapidly, fires multiple open remotes
 	spawn(function()
-		while task.wait(0.3) do
+		while task.wait(0.15) do
 			if _G.AutoChest then
 				pcall(function()
 					if not isAlive() then return end
 					local hrp = getHRP()
 					if not hrp then return end
 					local chests = CollectionService:GetTagged("_ChestTagged")
-					local nearest = nil
-					local bestDist = math.huge
+					local nearest, bestDist = nil, math.huge
 					for _, chest in ipairs(chests) do
 						if not chest:GetAttribute("IsDisabled") and chest.Parent then
 							local ok, pivot = pcall(function() return chest:GetPivot() end)
@@ -772,34 +772,41 @@ function LoadMainHub()
 								local d = (pivot.Position - hrp.Position).Magnitude
 								if d < bestDist then
 									bestDist = d
-									nearest = { pivot = pivot, chest = chest }
+									nearest = { obj = chest, pivot = pivot }
 								end
 							end
 						end
 					end
 					if nearest then
 						topos(nearest.pivot)
-						task.wait(0.2)
+						task.wait(0.1)
+						local chest = nearest.obj
+						-- Fire every possible chest remote
+						pcall(function() ReplicatedStorage.Remotes.CommF_:InvokeServer("ChestInteract", chest) end)
+						pcall(function() ReplicatedStorage.Remotes.CommF_:InvokeServer("OpenChest", chest) end)
+						pcall(function() ReplicatedStorage.Remotes.CommF_:InvokeServer("Loot", chest) end)
+						-- Also fire touch to trigger proximity collection
 						pcall(function()
-							ReplicatedStorage.Remotes.CommF_:InvokeServer("ChestInteract", nearest.chest)
-						end)
-						pcall(function()
-							ReplicatedStorage.Remotes.CommF_:InvokeServer("OpenChest", nearest.chest)
-						end)
-						pcall(function()
-							for _, remote in pairs(ReplicatedStorage.Remotes:GetChildren()) do
-								if string.find(remote.Name:lower(), "chest") then
-									pcall(function() remote:InvokeServer(nearest.chest) end)
-									pcall(function() remote:FireServer(nearest.chest) end)
+							for _, part in pairs(chest:GetDescendants()) do
+								if part:IsA("BasePart") then
+									pcall(function()
+										firetouchinterest(hrp, part, 0)
+										task.wait(0.02)
+										firetouchinterest(hrp, part, 1)
+									end)
 								end
 							end
 						end)
+						-- Walk into it by teleporting directly on top
+						task.wait(0.05)
+						topos(nearest.pivot)
 					end
 				end)
 			end
 		end
 	end)
 
+	-- HAKI LOOP
 	spawn(function()
 		while task.wait(0.1) do
 			if _G.Haki then
@@ -812,8 +819,9 @@ function LoadMainHub()
 		end
 	end)
 
+	-- PULL ALL PLAYERS — loop with direct HRP warp
 	spawn(function()
-		while task.wait(0.5) do
+		while task.wait(0.3) do
 			if _G.PullAllPlayers then
 				pcall(function()
 					local hrp = getHRP()
@@ -822,7 +830,7 @@ function LoadMainHub()
 						if plr ~= LP and plr.Character then
 							local pHRP = plr.Character:FindFirstChild("HumanoidRootPart")
 							if pHRP then
-								pHRP.CFrame = hrp.CFrame * CFrame.new(math.random(-5, 5), 0, math.random(-5, 5))
+								pHRP.CFrame = hrp.CFrame * CFrame.new(math.random(-4, 4), 0, math.random(-4, 4))
 							end
 						end
 					end
@@ -831,6 +839,7 @@ function LoadMainHub()
 		end
 	end)
 
+	-- INF ABILITY LOOP
 	spawn(function()
 		while task.wait() do
 			if _G.InfAbility then
@@ -855,6 +864,7 @@ function LoadMainHub()
 		end
 	end)
 
+	-- NOCLIP LOOP
 	spawn(function()
 		while task.wait(0.5) do
 			if NoClip and LP.Character then
@@ -867,6 +877,7 @@ function LoadMainHub()
 		end
 	end)
 
+	-- IDLE PREVENTION
 	pcall(function()
 		LP.Idled:Connect(function()
 			VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
@@ -875,6 +886,7 @@ function LoadMainHub()
 		end)
 	end)
 
+	-- PLAYER ESP LOOP
 	spawn(function()
 		while task.wait(1) do
 			if ESPPlayer then
@@ -926,6 +938,7 @@ function LoadMainHub()
 		end
 	end)
 
+	-- DEVIL FRUIT ESP
 	spawn(function()
 		while task.wait(1) do
 			if DevilFruitESP then
@@ -970,6 +983,7 @@ function LoadMainHub()
 		end
 	end)
 
+	-- CHEST ESP
 	spawn(function()
 		while task.wait(1) do
 			if _G.ChestESP then
@@ -1083,6 +1097,13 @@ function LoadMainHub()
 			Callback = function(v) _G.SelectWeapon = v end
 		})
 
+		FarmTab:AddSection({ "Speed" })
+		FarmTab:AddSlider({
+			Name = "Teleport Speed (lower = faster)",
+			Min = 50, Max = 500, Default = 200,
+			Callback = function(v) _G.TpSpeed = v end
+		})
+
 		FarmTab:AddSection({ "Main Farm" })
 		FarmTab:AddToggle({
 			Name = "Auto Farm Level",
@@ -1090,13 +1111,7 @@ function LoadMainHub()
 			Default = false,
 			Callback = function(v)
 				_G.AutoFarm = v
-				if not v then
-					StartBring = false
-					pcall(function()
-						local p = LP.Character and LP.Character:FindFirstChild("PartTele")
-						if p then p:Destroy() end
-					end)
-				end
+				if not v then StartBring = false end
 			end
 		})
 		FarmTab:AddToggle({
@@ -1122,15 +1137,7 @@ function LoadMainHub()
 			Name = "Auto Farm Chest",
 			Description = "Teleport to nearest chest and collect",
 			Default = false,
-			Callback = function(v)
-				_G.AutoChest = v
-				if not v then
-					pcall(function()
-						local p = LP.Character and LP.Character:FindFirstChild("PartTele")
-						if p then p:Destroy() end
-					end)
-				end
-			end
+			Callback = function(v) _G.AutoChest = v end
 		})
 
 		FarmTab:AddSection({ "Boss Farm" })
@@ -1153,15 +1160,7 @@ function LoadMainHub()
 		FarmTab:AddToggle({
 			Name = "Auto Farm Boss",
 			Default = false,
-			Callback = function(v)
-				_G.AutoBoss = v
-				if not v then
-					pcall(function()
-						local p = LP.Character and LP.Character:FindFirstChild("PartTele")
-						if p then p:Destroy() end
-					end)
-				end
-			end
+			Callback = function(v) _G.AutoBoss = v end
 		})
 
 		FarmTab:AddSection({ "Player Settings" })
@@ -1305,8 +1304,8 @@ function LoadMainHub()
 		local SetTab = win:MakeTab({ "Settings", "settings" })
 		SetTab:AddSection({ "Players" })
 		SetTab:AddToggle({
-			Name = "Pull All Players To Me",
-			Description = "Force all players to teleport to your position",
+			Name = "Pull All Players To Me (Loop)",
+			Description = "Continuously teleport all players to your location",
 			Default = false,
 			Callback = function(v) _G.PullAllPlayers = v end
 		})
@@ -1320,7 +1319,7 @@ function LoadMainHub()
 						if plr ~= LP and plr.Character then
 							local pHRP = plr.Character:FindFirstChild("HumanoidRootPart")
 							if pHRP then
-								pHRP.CFrame = hrp.CFrame * CFrame.new(math.random(-5, 5), 0, math.random(-5, 5))
+								pHRP.CFrame = hrp.CFrame * CFrame.new(math.random(-4, 4), 0, math.random(-4, 4))
 							end
 						end
 					end
