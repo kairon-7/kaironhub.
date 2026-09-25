@@ -7,7 +7,7 @@ local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 local VirtualUser = game:GetService("VirtualUser")
 
-local DISCORD_LINK = "https://discord.gg/wfSAuayQr"
+local DISCORD_LINK = "https://discord.gg/ZN4jtyPNHG"
 local VALID_KEY = "kairon-script"
 
 local function Corner(p, r)
